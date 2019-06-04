@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Prova HTML</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <style>
+        body {
+            background-color: powderblue;
+        }
+        
+        .ball {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: red;
+            position: fixed;
+            top: calc(50% - 50px);
+            left: calc(50% - 50px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>APRI LA PAGINE IN TAB MULTIPLE</h2>
+
+    <button id="others">INVIA ALLE ALTRE TABS</button>
+    <button id="all">INVIA I DATI A TUTTE LE ALTRE TABS INCLUSA QUESTA</button>
+
+    <p class="ball"></p>
+
+    <ul></ul>
+
+    <script src="hermes.js"></script>
+    <script>
+        const othersBtn = document.querySelector('#others');
+        const allBtn = document.querySelector('#all');
+        const ul = document.querySelector('ul');
+        const ball = document.querySelector('.ball');
+        othersBtn.onclick = () => hermes.send('event', new Date());
+        allBtn.onclick = () => hermes.send('event', new Date(), true);
+        hermes.on('event', function(data) {
+            const li = document.createElement('li');
+            li.textContent = data;
+            ul.appendChild(li);
+        });
+        hermes.on('moveball', function(data) {
+            ball.style.top = `calc(${data.y * 100}% - 50px)`;
+            ball.style.left = `calc(${data.x * 100}% - 50px)`;
+        });
+        let dragging = false;
+        ball.addEventListener('pointerdown', (e) => dragging = true);
+        document.addEventListener('pointerup', (e) => dragging = false);
+        document.addEventListener('pointermove', (e) => {
+            if (dragging) {
+                const data = {
+                    x: e.pageX / window.innerWidth,
+                    y: e.pageY / window.innerHeight
+                };
+                hermes.send('moveball', data, true);
+            }
+        });
+    </script>
+</body>
+
+</html>
